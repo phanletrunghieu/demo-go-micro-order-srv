@@ -7,19 +7,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	micro "github.com/micro/go-micro/v2"
 	"github.com/phanletrunghieu/demo-go-micro-order-srv/delivery/grpc"
-	pb "github.com/phanletrunghieu/demo-go-micro-order-srv/proto/order"
+	"github.com/phanletrunghieu/demo-go-micro-order-srv/delivery/http"
 )
 
 func main() {
-	srv := micro.NewService(
-		micro.Name("service.order"),
-	)
-
-	srv.Init()
-
-	pb.RegisterOrderServiceHandler(srv.Server(), &grpc.Handler{})
+	grpcSrv := grpc.New()
+	httpSrv := http.New()
 
 	errs := make(chan error)
 	go func() {
@@ -29,7 +23,10 @@ func main() {
 	}()
 
 	go func() {
-		errs <- srv.Run()
+		errs <- grpcSrv.Run()
+	}()
+	go func() {
+		errs <- httpSrv.Run()
 	}()
 
 	log.Println("exit", <-errs)

@@ -2,7 +2,7 @@ gen-protoc:
 	protoc --micro_out=. --go_out=. proto/order/order.proto
 
 build: gen-protoc
-	GOOS=linux GOARCH=amd64 go build -o ./bin/order-srv ./cmd/main.go
+	GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o ./bin/order-srv ./cmd/main.go
 
 dockerize:
 	docker build -t order-srv .
